@@ -186,15 +186,15 @@ def cal_loss(model, images, age_labels, gener_labels):
 
         age_feature = tf.reduce_mean(logits, 1) # [None, 10]
 
-        logit_distribution = tf.nn.softmax(age_feature, 1) # pdf를 통해 cdf를 구할 수 있음  시그마(pdf 함수) --> cdf구하는식
-        label_distribution = tf.nn.softmax(age_labels, 1)
+        logit_distribution = tf.nn.softmax(max_feature, 1) # pdf를 통해 cdf를 구할 수 있음  시그마(pdf 함수) --> cdf구하는식
+        label_distribution = tf.nn.softmax(gener_labels, 1)
 
         logit_CDF, label_CDF = cal_CDF(logit_distribution, label_distribution)
         logit_CDF, label_CDF = tf.convert_to_tensor(logit_CDF, dtype=tf.float32), tf.convert_to_tensor(label_CDF, dtype=tf.float32)
 
-        CDF_loss = tf.reduce_sum((logit_CDF - label_CDF)**2, 1)
-        CDF_loss = tf.reduce_mean(CDF_loss)
-        ###
+        CDF_loss = tf.reduce_sum(tf.pow(logit_CDF - label_CDF, 2), 1)
+        CDF_loss = tf.reduce_sum(CDF_loss) / FLAGS.batch_size
+        ### CDF 부분을 추가한 뒤 loss가 제대로 최소화돼지않고 값이 커진다. 이 loss만 추가했다고 이렇게 되나??
 
         loss = (-tf.reduce_sum( (tf.math.log_sigmoid(age_feature)*age_labels + (tf.math.log(1 - tf.math.sigmoid(age_feature)))*(1-age_labels)), 1))
         loss = tf.reduce_mean(loss)

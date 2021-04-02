@@ -27,7 +27,7 @@ FLAGS = easydict.EasyDict({"img_height": 128,
                            
                            "batch_size": 164,
                            
-                           "epochs": 500,
+                           "epochs": 300,
                            
                            "num_classes": 64,
                            
@@ -43,7 +43,7 @@ FLAGS = easydict.EasyDict({"img_height": 128,
                            
                            "pre_checkpoint_path": ""})
 
-optim = tf.keras.optimizers.SGD(FLAGS.lr)
+optim = tf.keras.optimizers.Adam(FLAGS.lr, beta_1=0.5, beta_2=0.999)
 
 def tr_func(img_list, lab_list):
 

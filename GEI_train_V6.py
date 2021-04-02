@@ -43,7 +43,10 @@ FLAGS = easydict.EasyDict({"img_height": 128,
                            
                            "pre_checkpoint_path": ""})
 
-optim = tf.keras.optimizers.Adam(FLAGS.lr, beta_1=0.5, beta_2=0.999)
+len_dataset = np.loadtxt(FLAGS.tr_txt_path, dtype=np.int32, skiprows=0, usecols=1)
+len_dataset = len(len_dataset) // FLAGS.batch_size
+lr_scheduler = LinearDecay(FLAGS.lr, FLAGS.epochs * len_dataset, 15 * len_dataset)  # 15 에폭마다!! 에폭부터가ㅣ아님!!!!! 고쳐야함
+optim = tf.keras.optimizers.Adam(lr_scheduler, beta_1=0.5, beta_2=0.999)
 
 def tr_func(img_list, lab_list):
 
